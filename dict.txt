@@ -1,0 +1,265 @@
+workflow; templates
+- another workflow
+- ordered actions
+- optionality
+- a more general dependency notion
+
+tasks; instances of workflow.
+- belong to sessions
+
+Task status. Can be
+0 - Pending
+1 - Started
+2 - Complete
+3 - Sealed
+
+A successful Post should seal a thing; a further change would require a contra-post.
+
+In terms of a hierarchy, a task as a sequence of steps would be complete when its last step is complete. Thus, all tasks have at least one step, the final step, 'Dispose' if you like.
+
+journal; log of everything - past, present, future. A notion of 'sealing'. When is something complete? How about storing invalid values? Has to be permissible. Just because the computer thinks it is invalid doesn't mean it really is. It doesn't pass the current validation tests is the true statement.
+
+So the top level workflow is the maintenance of the journal? When you log in, you get a 'New session' task, which presents you with:
+-  A menu
+-  Everything that is in progress and incomplete for any of your roles.
+
+user
+- id
+- name
+- validation scheme
+- validation scheme data, eg. password
+- role list
+- deleted marker
+
+entity
+- name
+- domain list
+- reference list
+- The entities hold the persistent application data. Perhaps we should think of
+  this as 'Posted' data, since we must have things corresponding to the
+  data collection steps. We want to be able to render them with rules applied
+  to a repositary, without bothering with individual form design.
+
+domain
+- name
+- parent domain
+- column heading
+- prompt
+- description
+- validation rules; or are these roles? Perhaps just a Javascript function. No,
+  because we cannot trust the browser; we have to revalidate everything anyway.
+  But a block of rules? No, a table of rules, with error messages.
+- language?! Separate table again. So can have English and Spanish.
+- Actually, all narratives should go in a separate table for translation
+  purposes, but leave that for now.
+
+Some rules
+- base names not to contain '_'
+- '_' used to separate compound elements
+domain
+- name
+- parent
+- description
+- col_head
+- prompt
+- comment
+
+entity
+- name
+- abbreviation (for relation building)
+
+entity_domain (ie. columns)
+- ent_name
+- dom_name
+
+validations
+- name (eg. min_length)
+- operator of some kind
+
+ent_dom_validation
+- ent_name
+- dom_name
+- val_name
+- value (a length, for instance, for min_length)
+
+relationship
+- ent_name_1
+
+
+domain_rules
+- 
+
+relationship; two way
+
+selection
+- list of things (which may be selections themselves? Maybe do this through relationships)
+
+action
+- make a choice (one option)
+- make a selection (multiple options)
+- collect data
+- do something with a selection
+
+panel
+- Perhaps the better way of looking at it is as a dashboard; the current window onto the application world. Need to know (either directly, or through optional exposure)
+  - session (and thus, user and role)
+  - task (instance of workflow)
+  - standard action buttons
+  - a collection of current things. List picking overlays; you can pick off this
+  - links (things that can take you elsewhere). But what exactly do you link to?
+    Say it's a customer name. Do you go to customer maintenance, view only
+    thereof? How about toggling between single view and multi-view? 
+    It looks like you have to link to a task.
+  - open sessions and tasks. Don't recurse. Rather, you can break off, and go
+    back to the current step of any open task.
+  - open sessions subject to timeout?
+  - The piece of recordset needs to be identified. And its sort order.
+
+role
+- roles are associated with most things. Users, entities, domains, tasks.
+- They control what is visible, and what can be edited
+- The roles are central to what appears in a panel at once. There is always a
+  role corresponding to a task. So, the Invoice Entry Role corresponds to the
+  Invoice Entry Task, and this controls what appears in the panel. So we look at
+  Invoice Entry, and there are:
+  -  At the bottom, the database tables, and their interrelationships. The
+     application as a whole is an editor of the database.
+  -  The Invoice Entry or whatever role identifies the tables, and the columns
+     within the tables, that appear, and whether they are potentially editable
+     or not.
+  -  What a user sees is the merging of the user's roles and the task roles. So
+     if a user has no edit rights to something, then editing is blocked, and if
+     they cannot see something at all, their access is blocked
+  -  The server uses all this to identify the data that is served up to the
+     browser
+  -  A big slab of functionality (Javascript in the browser) handles the
+     manipulations of what's in the panel.
+  -  A role must have a number of tags, most of which are optional
+     -  whatever role it is
+     -  user
+     -  related role
+     -  next role
+     -  an owning role
+     -  an entity
+     -  an array of permissions, whose meaning depends on what else is there
+  -  A big slab of functionality in the browser has to manage this
+  -  Roles and menu options are the same thing. A role can bundle a set of
+     other roles, and these will be part of a menu tree.
+  -  Default or directed role sequence isn't catered for in the
+     conceptualisation as yet. Notional 'Next/Previous' pointers are
+     problematic, since they don't lend themselves to sorting, and we might want
+     to re-use panels. Solution: 'Next' stored in role table, but the Task
+     created from the role relationships uses a numerical sequence. 
+
+acl
+
+session
+- session ID (short)
+- session key (long)
+- user
+- effective date
+- tasks in the journal
+
+action (not entirely convinced that it needs a table just now)
+- selection
+- verb
+
+verb
+- CREATE
+- CORRECT
+- DELETE
+- FILTER
+- FOLLOW
+- MODE
+- PICK
+- POSITION
+- SCROLL
+- SORT
+- SUPERSEDE
+
+permission
+- link
+- view
+- create
+- amend
+- delete
+
+So, work out what needs to go in the session files, and create a mockup covering the login, first menu, and master/detail updates to something.
+
+Standard flannel:
+- Application and execution environment (live, test, dev. etc.)
+- Current task
+  - Name of workflow
+  - Which step
+- Session details
+  - User details (Read-only except for login)
+  - Roles (Read-only)
+  - Current values list (can be picked off)
+- Journal (can be viewed or picked off)
+  - Needs to separately identify
+    - Sealed/completed elements
+    - Things in progress
+  - Role history is a key notion
+  - Have a big non-descript array, so with a sub-record sequence:
+    - sub-sequence 0 is the column headings plus control values (table name,
+      sort order, range or whatever)
+    - sub-sequence 1-n are the result set
+- Navigation
+  - New task launch
+- System day and date
+
+The stuff itself
+- There has to be a database table associated with every widget
+- The controls are completely standard
+- Every widget has query terms (as QBE plus limits for paging) and actual data
+- Generic rules from co-ordination give first cut
+- Roles control which fields are viewable and editable. Combine the
+  workflow-specific roles with roles from user
+
+Life cycle of task
+-  Start with the session data
+-  If the task does not already exist in the Journal, create it
+-  Process the workflow template in conjunction with the roles and/or whatever
+   is already in the Journal to arrive at what is to be sent to the client.
+   -  There need to be a succession of queries to build up:
+      -   Sequences of things (steps), arrays of choices (menus),
+          master/detail relationships (linkages), underlying database objects targeted
+          (data subsets). The data subsets:
+          -  Have to be derived from templates
+             -   Have to be filtered by the template, and by the users privileges, which
+                 can be specific to:
+                 -   The domain (there could be a rule forbidding someone from seeing
+                     salaries)
+                 -   The entity (e.g. a rule forbidding updates to payroll elements)
+                 -   The thing
+          -  Have to be owned by ... the session? Yes, because the user can jump
+             anywhere. If the user notionally jumps in, what they get is driven out from
+             the data; it links back to the node in the task tree that needs to be
+             displayed.
+          -  Optimistic locking
+      -   To keep the display comprehensible, we need a limit to the number of layers.
+          So faced with hierarchical relationships like
+          customers/orders/lines/allocations/deliveries/stock movements/products we can
+          keep
+          -  an unlimited depth of breadcrumb trail? But have an option to segue to a
+             different tree
+          -  only one exploded item - but perhaps show previous/next in breadcrumb list
+             to allow link-following navigation
+      -   The onscreen controls allow:
+          -  moving forwards and backwards through data sets
+          -  updating
+          -  following links. Not really any different to moving forwards and backwards
+             through sets. 
+          -  The user interface has to be entirely generated. UI design is forbidden.
+
+-  Save this starting data in a directory on the server.
+-  Serve up the stuff to the client.
+-  Javascript on the client actually generates the page from the data, validates
+   etc.
+-  The submission sends the data back in the same format as it was sent
+-  The server merges the before and after, generates updates, and if they are
+   successful applies them. There has to be an exit here, because validation
+   such as checking a journal balances is beyond the scope of the Javascript
+   (which might not have all the relevant data anyway), and we need to be able
+   to trigger processes and so forth, be they batch jobs or test runs.
+

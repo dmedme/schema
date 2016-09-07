@@ -1,0 +1,123 @@
+#include <windows.h>
+#include <winver.h>
+#include "e2schem_cmp.h"
+
+IDAPPLICON                  ICON    DISCARDABLE     "e2schem_cmp.ico"
+ID_ICON_DEL                 ICON    DISCARDABLE     "bigredd.ico"
+ID_ICON_BOTH                ICON    DISCARDABLE     "bigyellow.ico"
+ID_ICON_INS                 ICON    DISCARDABLE     "biggreeni.ico"
+
+DLG_ORASESSION DIALOG DISCARDABLE  8, 16, 174, 79
+STYLE DS_MODALFRAME |DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Enter ORACLE Sign-on"
+FONT 8, "Helv"
+BEGIN
+    LTEXT           "&ORACLE User:",ID_ORUSER,4,3,80,14
+    EDITTEXT        ID_ETORUSER,84,3,80,14,ES_AUTOHSCROLL
+    LTEXT           "&Password:",ID_ORPASS,4,21,80,14
+    EDITTEXT        ID_ETORPASS,84,21,80,14,ES_PASSWORD
+    LTEXT           "&TNS Name:",ID_ORTNS,4,39,80,14
+    EDITTEXT        ID_ETORTNS,84,39,80,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,4,59,40,14
+    PUSHBUTTON      "&Help",ID_HELP,64,59,40,14
+    PUSHBUTTON      "Cancel",IDCANCEL,124,59,40,14
+END
+
+IDMAINMENU MENU
+BEGIN
+	POPUP "&File"
+	BEGIN
+		MENUITEM "&New",IDM_NEW
+		MENUITEM "&Open",IDM_OPEN
+		MENUITEM "&E&xit",IDM_EXIT
+	END
+	POPUP "&Help"
+	BEGIN
+		MENUITEM "&About",IDM_ABOUT
+	END
+END
+IDACCEL ACCELERATORS
+BEGIN
+	"Q",	IDM_EXIT,VIRTKEY,CONTROL
+END
+
+IDD_ABOUT DIALOG 6, 18, 180, 53
+STYLE DS_MODALFRAME | DS_3DLOOK |WS_POPUP| WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "About e2schema_cmp"
+FONT 8, "Helv"
+BEGIN
+    LTEXT           "e2schema_cmp Version 0.3", 101, 11, 12, 132, 12
+    LTEXT           "Copyright (c) E2 Systems Limited 1998,2000", 102, 10, 25, 150, 12
+END
+
+DLG_E2_SCHEMA_CMP DIALOG 6, 18, 198, 175
+STYLE DS_MODALFRAME | DS_3DLOOK |WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU
+CAPTION "E2 Schema Comparator"
+FONT 8, "Helv"
+CLASS "E2_SCHEMA_CMP"
+BEGIN
+    CONTROL         "", ID_BOX_1, "Static", SS_ETCHEDFRAME, 9, 12, 178, 45
+    LTEXT           "    First Database", ID_DB_1, 67, 7, 55, 10
+    LTEXT           "DBA Sign-on", ID_FRST_SIGNON, 11, 71, 41, 12
+    COMBOBOX        ID_CBFRST_SIGNON, 55, 18, 126, 13, CBS_DROPDOWNLIST | WS_TABSTOP
+    LTEXT           "User ", ID_FRST_USER, 12, 42, 40, 12
+    COMBOBOX        ID_CBFRST_USER, 55, 42, 126, 13, CBS_DROPDOWN | WS_VSCROLL | CBS_UPPERCASE | CBS_AUTOHSCROLL | WS_TABSTOP
+    CONTROL         "", ID_BOX_2, "Static", SS_ETCHEDFRAME, 9, 64, 178, 45
+    LTEXT           "   Second Database", ID_DB_2, 63, 59, 64, 10
+    LTEXT           "DBA Sign-on", ID_SCND_SIGNON, 12, 18, 41, 12
+    COMBOBOX        ID_CBSCND_SIGNON, 55, 71, 126, 13, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "User ", ID_SCND_USER, 11, 95, 40, 12
+    COMBOBOX        ID_CBSCND_USER, 55, 95, 126, 13, CBS_DROPDOWN | CBS_UPPERCASE | CBS_AUTOHSCROLL | WS_TABSTOP
+    LTEXT           "Output File Name", ID_OFILE, 11, 118, 56, 12
+    COMBOBOX        ID_CBOFILE, 69, 118, 112, 11, CBS_DROPDOWNLIST | WS_TABSTOP
+    DEFPUSHBUTTON      "OK", IDOK, 32, 135, 40, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 110, 135, 40, 14
+END
+DLG_E2_SCHEMA_TREE DIALOG 13, 2, 381, 290
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "E2 Schema Difference Tree"
+FONT 8, "Helv"
+CLASS "E2DIFF_TREE"
+BEGIN
+    CONTROL         "", ID_TREE, "SysTreeView32", 0x0 | WS_CLIPSIBLINGS, 23, 23, 
+                    361, 229
+END
+DLG_E2_SCHEMA_LIST DIALOG 168, 2, 381, 290
+STYLE  DS_3DLOOK | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "E2 Schema Difference List"
+FONT 8, "Helv"
+CLASS "E2DIFF_LIST"
+BEGIN
+    CONTROL         "", ID_LIST, "SysListView32", 0x241 | WS_BORDER, 178, 23, 
+                    183, 229
+END
+/*
+ * Version Information
+ */
+1 VERSIONINFO
+FILEVERSION 0,0,0,1
+PRODUCTVERSION 0,0,0,1
+FILEFLAGSMASK 0x3f
+FILEFLAGS 0x3f
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+FILESUBTYPE 0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "Comments","Windows NT ORACLE Schema Comparator"
+            VALUE "CompanyName","E2 Systems Limited"
+            VALUE "FileDescription","E2 Systems ORACLE Schema Comparator"
+            VALUE "FileVersion","0.3"
+            VALUE "InternalName","e2schem_cmp"
+            VALUE "LegalCopyright","Copyright (c) E2 Systems Limited, 1998, 1999"
+            VALUE "OriginalFilename","e2schem_cmp.exe"
+            VALUE "ProductName","E2 Systems SQL Monitor"
+            VALUE "ProductVersion","0.3"
+        END
+    END
+END

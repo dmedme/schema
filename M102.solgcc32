@@ -1,0 +1,59 @@
+# 
+# M90.linux
+# @(#) $Name$ $Id$
+# Copyright (c) E2 Systems Limited 1993
+#
+# Makefile - Command file for "make" to compile DME's new programs
+#
+# Usage: make
+#
+# NOTE:   ORACLE_HOME must be either:
+#		. set in the user's environment
+#		. passed in on the command line
+#		. defined in a modified version of this makefile
+#
+#******************************************************************
+# Standard ORACLE crud
+LIBHOME=$(ORACLE_HOME)/lib
+COMPOBJ=$(LIBHOME)
+################
+CAT=cat
+#LEX = flex
+LEX = lex
+#YACC = bison
+YACC = yacc
+RANLIB = ar ts
+EXES = e2schem_cmp tabdiff sqldrive
+# ************************************************************************
+# ORACLE stuff
+# **********************************************************************
+all: $(EXES)
+	@echo "Driver Programs are Up To Date"
+include $(ORACLE_HOME)/rdbms/lib/env_rdbms.mk
+AR = ar rv
+CC = gcc
+#
+# For production:
+# - Take out the -DDEBUG
+# - (optional) change -gx to -O
+#
+LIBHOME=$(ORACLE_HOME)/lib
+CFLAGS = -m32 -DGLASGOW_HOUSING -O -fwritable-strings -DPOSIX -DSCO -DV4 -DICL -DSOLAR -DSOL10 -I. -I$(ORACLE_HOME)/rdbms/demo -I$(ORACLE_HOME)/rdbms/public -I../e2common -I../perfdb -L$(LIBHOME) -DOR9
+LDSTRING= -m32  -lc $(COMPSOBJS) $(COMPEOBJS)
+LIBS=../perfdb/perf.a ../e2common/comlib.a  -lsocket -lnsl -lm -lc -ldl -laio $(LDSTRING) -lm -ldl -lposix4
+################
+#*************************************************************************
+# Main Schema Comparison components
+# VVVVVVVVVVVVVVVVVVVVVV
+
+sqldrive: dodesc.o sqldrive.o ../perfdb/perf.a ../e2common/comlib.a
+	$(LD) $(LDFLAGS)  sqldrive.o dodesc.o ../perfdb/perf.a $(TTLIBS) $(LIBS)
+tabdiff: tabdiff.o ../perfdb/perf.a
+	$(LD) $(LDFLAGS)  tabdiff.o ../perfdb/perf.a malloc.o $(TTLIBS) $(LIBS)
+
+.c.o: ../perfdb/tabdiff.h
+	$(CC) $(CFLAGS) -c $*.c
+
+e2schem_cmp: e2schem_cmp.o e2sor.o diffx.o ../perfdb/perf.a
+	$(LD) $(LDFLAGS)  e2schem_cmp.o e2sor.o diffx.o ../perfdb/perf.a $(TTLIBS) $(LIBS)
+

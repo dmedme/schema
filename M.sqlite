@@ -1,0 +1,49 @@
+# 
+# M.sqlite
+# @(#) $Name$ $Id$
+# Copyright (c) E2 Systems Limited 1993
+#
+# Makefile - Command file for "make" to compile DME's new programs
+#
+# Usage: make
+################
+CAT=cat
+#LEX = flex
+LEX = lex
+#YACC = bison
+YACC = yacc
+RANLIB = ar ts
+EXES = tabdiff
+# ************************************************************************
+# ORACLE stuff
+# **********************************************************************
+all: $(EXES)
+	@echo "Driver Programs are Up To Date"
+AR = ar rv
+CC = gcc
+SUBOBS = e2sqlitelib.o e2sqllib.o e2srclib.o cspars.o csexe.o
+#
+# For production:
+# - Take out the -DDEBUG
+# - (optional) change -gx to -O
+#
+CFLAGS = -DSQLITE3 -g2 -DPOSIX -DAIX -DLINUX -D_BSD_SOURCE -I. -I../e2common -L/lib -I../fastclone -I../e2prox -I../e2net -I../perfdb -DPATH_AT -DNOBPF_H -DNOTCP_H -DNOETHER_H -O4
+LDSTRING= -lsqlite3 -lc 
+LIBS=../fastclone/e2dfflib.o ../e2common/comlib.a  $(LDSTRING) ../gdbm/libgdbm.a -lsqlite3 -lpthread -lm -lc
+################
+#*************************************************************************
+# Main Schema Comparison components
+# VVVVVVVVVVVVVVVVVVVVVV
+sqldrive: sqldrive.o ../perfdb/perf.a ../e2common/comlib.a
+	$(CC) $(LDFLAGS) -o $@ sqldrive.o ../perfdb/perf.a $(LIBS)
+tabdiff: tabdiff.o $(SUBOBS) ../perfdb/perf.a ../e2common/comlib.a
+	$(CC) $(LDFLAGS) -O4 -o $@ tabdiff.o $(SUBOBS) ../perfdb/perf.a $(LIBS)
+
+.c.o: tabdiff.h
+	$(CC) $(CFLAGS) -c $*.c
+
+e2schem_cmp: e2schem_cmp.o e2sor.o diffs.o ../perfdb/perf.a ../e2common/comlib.a
+	$(CC) $(LDFLAGS) -o $@ e2schem_cmp.o e2sor.o diffs.o ../perfdb/perf.a $(LIBS)
+
+diffx: diffx.c
+	$(CC) $(CFLAGS) -g -DDEBUG -DSTAND diffx.c -o diffx $(OCILDLIBS) $(LIBS)

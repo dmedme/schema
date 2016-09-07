@@ -1,0 +1,54 @@
+# 
+# M112.linux
+# @(#) $Name$ $Id$
+# Copyright (c) E2 Systems Limited 1993
+#
+# Makefile - Command file for "make" to compile DME's new programs
+#
+# Usage: make
+#
+# NOTE:   ORACLE_HOME must be either:
+#		. set in the user's environment
+#		. passed in on the command line
+#		. defined in a modified version of this makefile
+#
+#******************************************************************
+# Standard ORACLE crud
+################
+ORACLE_HOME=/opt/oracle/instantclient_11_2
+CAT=cat
+#LEX = flex
+LEX = lex
+#YACC = bison
+YACC = yacc
+RANLIB = ar ts
+NATSOCK=natsock.o
+M32_OR_64 = -m64
+#ORACLE_CFLAGS= -DLINUX -D_GNU_SOURCE -D_REENTRANT -g -I$(ORACLE_HOME)/sdk/include -L$(ORACLE_HOME)
+LIBHOME=$(ORACLE_HOME)
+ORACLE_CFLAGS= -DLINUX -D_REENTRANT -g -I$(ORACLE_HOME)/sdk/include
+LDSTRING=  -lc $(COMPOBJS)
+CFLAGS = -DPATH_AT $(M32_OR_64) -DGLASGOW_HOUSING -DOR9 -DOR10 -DNOPRIV -O4 -DPOSIX -DAIX -DLINUX -D_BSD_SOURCE -I. -I../e2common -I../e2prox -I../e2net -I../fastclone -I../perfdb -L/lib -L/usr/lib -L$(LIBHOME) -DINCLUDE_EARLY -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DDOING_PATH $(ORACLE_CFLAGS) -D_LARGEFILE_64SOURCE -DNOBPF_H -DNOTCP_H -DNOETHER_H
+LDSTRING=-L$(LIBHOME) $(LIBHOME)/libocci.so.11.1 $(LIBHOME)/libclntsh.so.11.1 -lnnz11 -lheteroxa11
+LDFLAGS=
+LIBS=IRlib.a perf.a ../e2common/comlib.a  $(LDSTRING) ../gdbm/libgdbm.a -lm -lc -ldl -lpthread
+LIBS=../fastclone/e2dfflib.o ../perfdb/perf.a ../e2common/comlib.a  $(LDSTRING) ../gdbm/libgdbm.a -lm -lpthread -lc -ldl
+LDFLAGS=
+################
+#*************************************************************************
+# Main Schema Comparison components
+# VVVVVVVVVVVVVVVVVVVVVV
+
+sqldrive: sqldrive.o ../perfdb/perf.a ../e2common/comlib.a
+	$(CC) $(LDFLAGS) -o $@ sqldrive.o ../perfdb/perf.a $(LIBS)
+tabdiff: tabdiff.o ../perfdb/perf.a ../e2common/comlib.a
+	$(CC) $(LDFLAGS) -o $@ tabdiff.o ../perfdb/perf.a $(LIBS)
+
+.c.o: ../perfdb/tabdiff.h
+	$(CC) $(CFLAGS) -c $*.c
+
+e2schem_cmp: e2schem_cmp.o e2sor.o diffs.o ../perfdb/perf.a ../e2common/comlib.a
+	$(CC) $(LDFLAGS) -o $@ e2schem_cmp.o e2sor.o diffs.o ../perfdb/perf.a $(LIBS)
+
+diffx: diffx.c
+	$(CC) $(CFLAGS) -DSTAND diffx.c -o diffx $(OCILDLIBS) $(LIBS)
